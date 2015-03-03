@@ -10,6 +10,7 @@ namespace AlgoTest
     {
         static void Main(string[] args)
         {
+
         }
     }
 }
