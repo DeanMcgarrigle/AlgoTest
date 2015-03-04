@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgoTest", "AlgoTest\AlgoTest.csproj", "{25044493-0929-4E4C-B8F2-B0BA142D040F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess\DataAccess.csproj", "{20164F79-D2B9-4D55-86E5-6B885F8FC999}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{F901E011-CB68-4EE6-9C5B-39A5C0EE7A82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{25044493-0929-4E4C-B8F2-B0BA142D040F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25044493-0929-4E4C-B8F2-B0BA142D040F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25044493-0929-4E4C-B8F2-B0BA142D040F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20164F79-D2B9-4D55-86E5-6B885F8FC999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20164F79-D2B9-4D55-86E5-6B885F8FC999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20164F79-D2B9-4D55-86E5-6B885F8FC999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20164F79-D2B9-4D55-86E5-6B885F8FC999}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F901E011-CB68-4EE6-9C5B-39A5C0EE7A82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F901E011-CB68-4EE6-9C5B-39A5C0EE7A82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F901E011-CB68-4EE6-9C5B-39A5C0EE7A82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F901E011-CB68-4EE6-9C5B-39A5C0EE7A82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
