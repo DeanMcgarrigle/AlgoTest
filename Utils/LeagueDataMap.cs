@@ -3,7 +3,7 @@ using Model;
 
 namespace Utils
 {
-    public class LeagueDataMap : CsvClassMap<LeagueData>
+    public sealed class LeagueDataMap : CsvClassMap<LeagueData>
     {
         public LeagueDataMap()
         {
