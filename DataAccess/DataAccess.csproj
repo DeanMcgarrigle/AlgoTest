@@ -51,6 +51,7 @@
     <Compile Include="AlgoTestContext.cs" />
     <Compile Include="DbInfo.cs" />
     <Compile Include="DbInfoSample.cs" />
+    <Compile Include="LeagueRepository.cs" />
     <Compile Include="Migrations\201503051106271_Initial.cs" />
     <Compile Include="Migrations\201503051106271_Initial.Designer.cs">
       <DependentUpon>201503051106271_Initial.cs</DependentUpon>

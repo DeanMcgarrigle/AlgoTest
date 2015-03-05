@@ -1,12 +1,22 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
+using CsvHelper.Configuration;
 
 namespace Utils
 {
-    public class Downloader : IDownloader
+    public class Downloader<T, TMap> where TMap : CsvClassMap
     {
-        public async void DownloadFile(string urlFilePath, string fileOutputPath)
+        private readonly CsvHandler<T, TMap> _csvHandler;
+
+        public Downloader(CsvHandler<T, TMap> csvHandler)
+        {
+            _csvHandler = csvHandler;
+        }
+
+        public async Task<IEnumerable<T>> DownloadFile(string urlFilePath)
         {
             try
             {
@@ -17,26 +27,28 @@ namespace Utils
                     response.EnsureSuccessStatusCode();
                     var httpStream = await response.Content.ReadAsStreamAsync();
 
-                    // write file
-                    using (var fileStream = new FileStream(fileOutputPath, FileMode.Create, FileAccess.Write))
-                    {
-                        using (var writer = new StreamReader(httpStream))
-                        {
-                            httpStream.CopyTo(fileStream);
-                            fileStream.Flush();
-                        }
-                    }
+                    //// write file
+                    //using (var fileStream = new FileStream(fileOutputPath, FileMode.Create, FileAccess.Write))
+                    //{
+                    //    using (var writer = new StreamReader(httpStream))
+                    //    {
+                    //        httpStream.CopyTo(fileStream);
+                    //        fileStream.Flush();
+                    //    }
+                    //}
+
+                    return _csvHandler.Parse(httpStream);
                 }
             }
             catch (Exception ex)
             {
-                
+                return new List<T>().AsEnumerable();
             }
         }
     }
 
-    public interface IDownloader
-    {
-        void DownloadFile(string urlFilePath, string fileOutputPath);
-    }
+    //public interface IDownloader
+    //{
+    //    void DownloadFile(string urlFilePath, string fileOutputPath);
+    //}
 }

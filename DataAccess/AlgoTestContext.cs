@@ -17,16 +17,16 @@ namespace DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Configurations.AddFromAssembly(typeof(LeagueDataMap).Assembly);
+            modelBuilder.Configurations.AddFromAssembly(typeof(LeagueDataEntityMap).Assembly);
         }
 
         public DbSet<LeagueData> LeagueData { get; set; }
 
     }
 
-    public class LeagueDataMap : EntityTypeConfiguration<LeagueData>
+    public class LeagueDataEntityMap : EntityTypeConfiguration<LeagueData>
     {
-        public LeagueDataMap()
+        public LeagueDataEntityMap()
         {
             ToTable("LeagueData");
             HasKey(x => new { x.DateTime, x.HomeTeam, x.AwayTeam });

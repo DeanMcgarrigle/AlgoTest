@@ -3,9 +3,9 @@ using Model;
 
 namespace Utils
 {
-    sealed class ClassMap : CsvClassMap<LeagueData>
+    public class LeagueDataMap : CsvClassMap<LeagueData>
     {
-        public ClassMap()
+        public LeagueDataMap()
         {
             Map(m => m.League).Name("Div");
             Map(m => m.DateTime).Name("Date");

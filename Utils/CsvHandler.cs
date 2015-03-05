@@ -1,55 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CsvHelper;
-using DataAccess;
-using Model;
+using CsvHelper.Configuration;
 
 namespace Utils
 {
-    class CsvHandler
+    public class CsvHandler<T, TMap> where TMap : CsvClassMap
     {
-        private static void Main(string[] args)
+        private readonly string[] _files;
+
+        public CsvHandler(string directory)
         {
-            var context = new AlgoTestContext();
-            var existingFixtures = context.LeagueData.ToList();
-            const string directory = @"C:\Users\dean.mcgarrigle\Dropbox\Documents\FootballData";
+            _files = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
+        }
 
-            var files = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
-
-            var index = 0;
-            foreach (var file in files)
+        public IEnumerable<T> Parse()
+        {
+            var records = new List<T>();
+            foreach (var file in _files)
             {
                 using (var sr = new StreamReader(file))
                 {
-                    var reader = new CsvReader(sr);
-                    reader.Configuration.RegisterClassMap<ClassMap>();
-
-                    //CSVReader will now read the whole file into an enumerable
-                    IEnumerable<LeagueData> records = reader.GetRecords<LeagueData>();
-
-                    //First 5 records in CSV file will be printed to the Output Window
-                    foreach (var record in records)
-                    {
-                        var thisFixture =
-                            existingFixtures.FirstOrDefault(
-                                x =>
-                                    x.DateTime == record.DateTime && x.HomeTeam == record.HomeTeam &&
-                                    x.AwayTeam == record.AwayTeam);
-                        if (thisFixture == null)
-                        {
-                            context.LeagueData.Add(record);
-                            Console.WriteLine("Added: {0}", index++);
-                        }
-
-                        //Debug.Print("{0} {1} {2} {3}", record.League, record.HomeTeam, record.AwayTeam, record.DateTime );
-                    }
+                    records.AddRange(GetRecords(sr));
                 }
             }
 
-            context.SaveChanges();
+            return records.AsEnumerable();
+        }
 
+        public IEnumerable<T> Parse(Stream stream)
+        {
+            using (var sr = new StreamReader(stream))
+            {
+                return GetRecords(sr);
+            }
+        }
+
+        private static IEnumerable<T> GetRecords(TextReader sr)
+        {
+            var reader = new CsvReader(sr);
+            reader.Configuration.RegisterClassMap<TMap>();
+            return reader.GetRecords<T>();
         }
     }
 }
