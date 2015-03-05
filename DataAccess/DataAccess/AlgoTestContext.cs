@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration;
 using Model;
 
 namespace DataAccess
@@ -14,6 +15,21 @@ namespace DataAccess
 
         }
 
-        public DbSet<SomeTable> SomeTables { get; set; }
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Configurations.AddFromAssembly(typeof(LeagueDataMap).Assembly);
+        }
+
+        public DbSet<LeagueData> LeagueData { get; set; }
+
+    }
+
+    public class LeagueDataMap : EntityTypeConfiguration<LeagueData>
+    {
+        public LeagueDataMap()
+        {
+            ToTable("LeagueData");
+            HasKey(x => new { x.DateTime, x.HomeTeam, x.AwayTeam });
+        }
     }
 }

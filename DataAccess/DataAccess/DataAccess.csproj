@@ -49,9 +49,9 @@
     <Compile Include="AlgoTestContext.cs" />
     <Compile Include="DbInfo.cs" />
     <Compile Include="DbInfoSample.cs" />
-    <Compile Include="Migrations\201503041451467_Initial.cs" />
-    <Compile Include="Migrations\201503041451467_Initial.Designer.cs">
-      <DependentUpon>201503041451467_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201503051106271_Initial.cs" />
+    <Compile Include="Migrations\201503051106271_Initial.Designer.cs">
+      <DependentUpon>201503051106271_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,8 +67,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201503041451467_Initial.resx">
-      <DependentUpon>201503041451467_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201503051106271_Initial.resx">
+      <DependentUpon>201503051106271_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

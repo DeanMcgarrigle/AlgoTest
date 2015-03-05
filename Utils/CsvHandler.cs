@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CsvHelper;
+using DataAccess;
+using Model;
 
 namespace Utils
 {
@@ -10,20 +12,44 @@ namespace Utils
     {
         private static void Main(string[] args)
         {
-            using (var sr = new StreamReader(@"C:\Users\dean.mcgarrigle\Downloads\E0.csv"))
+            var context = new AlgoTestContext();
+            const string directory = @"C:\Users\dean.mcgarrigle\Dropbox\Documents\FootballData";
+
+            var files = Directory.GetFiles(directory);
+
+            var existingFixtures = context.LeagueData.ToList();
+            var index = 0;
+            foreach (var file in files)
             {
-                var reader = new CsvReader(sr);
-                reader.Configuration.RegisterClassMap<ClassMap>();
- 
-                //CSVReader will now read the whole file into an enumerable
-                IEnumerable<DataModel> records = reader.GetRecords<DataModel>();
- 
-                //First 5 records in CSV file will be printed to the Output Window
-                foreach (DataModel record in records.Take(5))
+                using (var sr = new StreamReader(file))
                 {
-                    Debug.Print("{0} {1} {2} {3}", record.League, record.HomeTeam, record.AwayTeam, record.DateTime );
+                    var reader = new CsvReader(sr);
+                    reader.Configuration.RegisterClassMap<ClassMap>();
+
+                    //CSVReader will now read the whole file into an enumerable
+                    IEnumerable<LeagueData> records = reader.GetRecords<LeagueData>();
+
+                    //First 5 records in CSV file will be printed to the Output Window
+                    foreach (var record in records)
+                    {
+                        var thisFixture =
+                            existingFixtures.FirstOrDefault(
+                                x =>
+                                    x.DateTime == record.DateTime && x.HomeTeam == record.HomeTeam &&
+                                    x.AwayTeam == record.AwayTeam);
+                        if (thisFixture == null)
+                        {
+                            context.LeagueData.Add(record);
+                            Console.WriteLine("Added: {0}", index++);
+                        }
+
+                        //Debug.Print("{0} {1} {2} {3}", record.League, record.HomeTeam, record.AwayTeam, record.DateTime );
+                    }
                 }
             }
+
+            context.SaveChanges();
+
         }
     }
 }
