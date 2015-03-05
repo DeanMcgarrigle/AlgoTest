@@ -8,17 +8,11 @@ namespace Utils
 {
     public class CsvHandler<T, TMap> where TMap : CsvClassMap
     {
-        private readonly string[] _files;
-
-        public CsvHandler(string directory)
+        public IEnumerable<T> Parse(string directory)
         {
-            _files = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
-        }
-
-        public IEnumerable<T> Parse()
-        {
+            var files = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
             var records = new List<T>();
-            foreach (var file in _files)
+            foreach (var file in files)
             {
                 using (var sr = new StreamReader(file))
                 {

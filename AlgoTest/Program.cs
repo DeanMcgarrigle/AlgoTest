@@ -12,11 +12,10 @@ namespace AlgoTest
             const string fileUrl = @"SomeFileURLHere";
             var context = new AlgoTestContext();
             var leagueRepo = new LeagueRepository(context);
+            var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>();
 
             // FILE STUFF
-            var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>(directory);
-            var fixtures = csvHandler.Parse();
-
+            var fixtures = csvHandler.Parse(directory);
             foreach (var fixture in fixtures)
             {
                 leagueRepo.AddFixture(fixture);
