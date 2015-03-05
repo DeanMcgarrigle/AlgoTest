@@ -13,11 +13,11 @@ namespace Utils
         private static void Main(string[] args)
         {
             var context = new AlgoTestContext();
+            var existingFixtures = context.LeagueData.ToList();
             const string directory = @"C:\Users\dean.mcgarrigle\Dropbox\Documents\FootballData";
 
-            var files = Directory.GetFiles(directory);
+            var files = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
 
-            var existingFixtures = context.LeagueData.ToList();
             var index = 0;
             foreach (var file in files)
             {
