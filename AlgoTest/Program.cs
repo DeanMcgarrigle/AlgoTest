@@ -15,15 +15,14 @@ namespace AlgoTest
             var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>();
 
             // FILE STUFF
-            var fixtures = csvHandler.Parse(directory);
+            var fixtures = csvHandler.ParseFile(directory);
             foreach (var fixture in fixtures)
             {
                 leagueRepo.AddFixture(fixture);
             }
 
             //DOWNLOAD STUFF
-            var downloader = new Downloader<LeagueData, LeagueDataMap>(csvHandler);
-            var results = downloader.DownloadFile(fileUrl).Result;
+            var results = csvHandler.DownloadFile(fileUrl).Result;
             foreach (var result in results)
             {
                 leagueRepo.AddFixture(result);

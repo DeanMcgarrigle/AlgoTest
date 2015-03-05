@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="CsvHandler.cs" />
     <Compile Include="LeagueDataMap.cs" />
-    <Compile Include="Downloader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

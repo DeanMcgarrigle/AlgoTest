@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -8,7 +11,7 @@ namespace Utils
 {
     public class CsvHandler<T, TMap> where TMap : CsvClassMap
     {
-        public IEnumerable<T> Parse(string directory)
+        public IEnumerable<T> ParseFile(string directory)
         {
             var files = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
             var records = new List<T>();
@@ -23,11 +26,25 @@ namespace Utils
             return records.AsEnumerable();
         }
 
-        public IEnumerable<T> Parse(Stream stream)
+        public async Task<IEnumerable<T>> DownloadFile(string urlFilePath)
         {
-            using (var sr = new StreamReader(stream))
+            try
             {
-                return GetRecords(sr);
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync(urlFilePath);
+                    response.EnsureSuccessStatusCode();
+                    var httpStream = await response.Content.ReadAsStreamAsync();
+
+                    using (var sr = new StreamReader(httpStream))
+                    {
+                        return GetRecords(sr);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<T>().AsEnumerable();
             }
         }
 
