@@ -17,11 +17,13 @@ namespace AlgoTest
             var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>();
 
             var lastSixHomeGamesForArsenal = leagueRepo.GetLastSixHomeResults("Arsenal");
-            Console.WriteLine("Wins: {0}, Draws: {1}, Losses: {2}, Points: {3}", 
+            Console.WriteLine("Wins: {0}, Draws: {1}, Losses: {2}, Points: {3}, Average Goals Scored per Game: {4}, Average Goals Conceded per Game: {5}", 
                 lastSixHomeGamesForArsenal.Wins, 
                 lastSixHomeGamesForArsenal.Draws, 
                 lastSixHomeGamesForArsenal.Losses, 
-                lastSixHomeGamesForArsenal.Points);
+                lastSixHomeGamesForArsenal.Points,
+                lastSixHomeGamesForArsenal.AvgGoalsScoredPerGame,
+                lastSixHomeGamesForArsenal.AvgGoalsConcededPerGame);
             Console.ReadLine();
 
             //// FILE STUFF

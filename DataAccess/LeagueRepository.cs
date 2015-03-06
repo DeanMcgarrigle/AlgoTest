@@ -36,7 +36,9 @@ namespace DataAccess
                     Wins = x.Count(y => y.FullTimeResult == "H"),
                     Draws = x.Count(y => y.FullTimeResult == "D"),
                     Losses = x.Count(y => y.FullTimeResult == "A"),
-                    Points = x.Sum(y => y.FullTimeResult == "H" ? 3 : y.FullTimeResult == "D" ? 1 : 0)
+                    Points = x.Sum(y => y.FullTimeResult == "H" ? 3 : y.FullTimeResult == "D" ? 1 : 0),
+                    AvgGoalsScoredPerGame = x.Average(y => y.FullTimeHomeGoals),
+                    AvgGoalsConcededPerGame = x.Average(y => y.FullTimeAwayGoals)
                 })
                 .FirstOrDefault();
         }
