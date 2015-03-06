@@ -26,19 +26,36 @@ namespace DataAccess
             }
         }
 
-        public int GetHomeTeamScore(string team, DateTime startDate)
+        public int GetHomeTeamGoalsAgainstScore(string team, DateTime startDate)
         {
             var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
                 .FirstOrDefault(x => x.HomeTeam == team)
                 .League;
             var homeTeamGoals =
                 _context.LeagueData.Where(x => x.DateTime >= startDate)
-                    .Where(
-                        x =>
-                            x.League == league
-                           )
+                    .Where(x => x.League == league)
                     .GroupBy(x => x.HomeTeam)
-                    .Select(x => new
+                    .Select(x => new TeamScoring
+                    {
+                        Team = x.Key,
+                        Goals = x.Sum(y => y.FullTimeAwayGoals)
+                    })
+                    .OrderByDescending(x => x.Goals)
+                    .ToList();
+
+            return GetScores(team, homeTeamGoals, SortOrder.Desc);
+        }
+
+        public int GetAwayTeamGoalsAgainstScore(string team, DateTime startDate)
+        {
+            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
+                .FirstOrDefault(x => x.HomeTeam == team)
+                .League;
+            var homeTeamGoals =
+                _context.LeagueData.Where(x => x.DateTime >= startDate)
+                    .Where(x => x.League == league)
+                    .GroupBy(x => x.AwayTeam)
+                    .Select(x => new TeamScoring
                     {
                         Team = x.Key,
                         Goals = x.Sum(y => y.FullTimeHomeGoals)
@@ -46,26 +63,30 @@ namespace DataAccess
                     .OrderByDescending(x => x.Goals)
                     .ToList();
 
-            var mostGoals = homeTeamGoals.Max(y => y.Goals);
-            var leastGoals = homeTeamGoals.Min(y => y.Goals);
-            var difference = (mostGoals - leastGoals) / 9;
-            var currentGoals = mostGoals;
-
-            var homeGoalsAgg = Enumerable.Range(1, 10)
-                .Select((x, i) => i == 0 ? currentGoals : currentGoals -= difference)
-                .OrderBy(x => x)
-                .ToList();
-
-            var closest = homeGoalsAgg
-                .Select(n => new { n, Distance = Math.Abs(n - homeTeamGoals.FirstOrDefault(x => x.Team == team).Goals) })
-                .OrderBy(x => x.Distance)
-                .First()
-                .n;
-
-            return homeGoalsAgg.IndexOf(closest) + 1;
+            return GetScores(team, homeTeamGoals, SortOrder.Desc);
         }
 
-        public int GetAwayTeamScore(string team, DateTime startDate)
+        public int GetHomeTeamGoalsForScore(string team, DateTime startDate)
+        {
+            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
+                .FirstOrDefault(x => x.HomeTeam == team)
+                .League;
+            var homeTeamGoals =
+                _context.LeagueData.Where(x => x.DateTime >= startDate)
+                    .Where(x => x.League == league)
+                    .GroupBy(x => x.HomeTeam)
+                    .Select(x => new TeamScoring
+                    {
+                        Team = x.Key,
+                        Goals = x.Sum(y => y.FullTimeHomeGoals)
+                    })
+                    .OrderByDescending(x => x.Goals)
+                    .ToList();
+
+            return GetScores(team, homeTeamGoals);
+        }
+
+        public int GetAwayTeamGoalsForScore(string team, DateTime startDate)
         {
             var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
                             .FirstOrDefault(x => x.AwayTeam == team)
@@ -74,7 +95,7 @@ namespace DataAccess
                 _context.LeagueData.Where(x => x.DateTime >= startDate)
                     .Where(x => x.League == league)
                     .GroupBy(x => x.AwayTeam)
-                    .Select(x => new
+                    .Select(x => new TeamScoring
                     {
                         Team = x.Key,
                         Goals = x.Sum(y => y.FullTimeAwayGoals)
@@ -82,23 +103,7 @@ namespace DataAccess
                     .OrderByDescending(x => x.Goals)
                     .ToList();
 
-            var mostGoals = awayTeamGoals.Max(y => y.Goals);
-            var leastGoals = awayTeamGoals.Min(y => y.Goals);
-            var difference = (mostGoals - leastGoals) / 9;
-            var currentGoals = mostGoals;
-
-            var awayGoalsAgg = Enumerable.Range(1, 10)
-                .Select((x, i) => i == 0 ? currentGoals : currentGoals -= difference)
-                .OrderBy(x => x)
-                .ToList();
-
-            var closest = awayGoalsAgg
-                .Select(n => new { n, Distance = Math.Abs(n - awayTeamGoals.FirstOrDefault(x => x.Team == team).Goals) })
-                .OrderBy(x => x.Distance)
-                .First()
-                .n;
-
-            return awayGoalsAgg.IndexOf(closest) + 1;
+            return GetScores(team, awayTeamGoals);
         }
 
         public Result GetLastSixHomeResults(string team)
@@ -117,6 +122,31 @@ namespace DataAccess
                     AvgGoalsConcededPerGame = x.Average(y => y.FullTimeAwayGoals)
                 })
                 .FirstOrDefault();
+        }
+
+        private static int GetScores(string team, List<TeamScoring> teamGoals, SortOrder sortOrder = SortOrder.Asc)
+        {
+            var mostGoals = teamGoals.Max(y => y.Goals);
+            var leastGoals = teamGoals.Min(y => y.Goals);
+            var difference = (mostGoals - leastGoals) / 9;
+            var currentGoals = mostGoals;
+
+            var goalsAgg = Enumerable.Range(1, 10)
+                .Select((x, i) => i == 0 ? currentGoals : currentGoals -= difference)
+                .OrderBy(x => x)
+                .ToList();
+
+            var result = goalsAgg
+                            .Select(n => new { n, Distance = Math.Abs(n - teamGoals.FirstOrDefault(x => x.Team == team).Goals) })
+                            .OrderBy(x => x.Distance).First().n;
+
+            return sortOrder == SortOrder.Asc ? goalsAgg.IndexOf(result) + 1 : goalsAgg.Count - goalsAgg.IndexOf(result);
+        }
+
+        private enum SortOrder
+        {
+            Asc,
+            Desc
         }
     }
 }

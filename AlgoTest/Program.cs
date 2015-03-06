@@ -28,10 +28,12 @@ namespace AlgoTest
 
             var seasonStart = new DateTime(2014, 08, 08);
 
-            var fulhamHomeGoalsScore = leagueRepo.GetHomeTeamScore("Fulham", seasonStart);
-            var bouremouthAwayGoalsScore = leagueRepo.GetAwayTeamScore("Bournemouth", seasonStart);
+            var fulhamHomeGoalsForScore = leagueRepo.GetHomeTeamGoalsForScore("Fulham", seasonStart);
+            var fulhamHomeGoalsAgainstScore = leagueRepo.GetHomeTeamGoalsAgainstScore("Fulham", seasonStart);
+            var bouremouthAwayGoalsForScore = leagueRepo.GetAwayTeamGoalsForScore("Bournemouth", seasonStart);
+            var bouremouthAwayGoalsAgainstScore = leagueRepo.GetAwayTeamGoalsAgainstScore("Bournemouth", seasonStart);
             Console.WriteLine();
-            Console.WriteLine("Fulham: {0}, Bournemouth: {1}", fulhamHomeGoalsScore, bouremouthAwayGoalsScore);
+            Console.WriteLine("Fulham: {0} {2}, Bournemouth: {1} {3}", fulhamHomeGoalsForScore, bouremouthAwayGoalsForScore, fulhamHomeGoalsAgainstScore, bouremouthAwayGoalsAgainstScore);
 
             Console.ReadLine();
 
