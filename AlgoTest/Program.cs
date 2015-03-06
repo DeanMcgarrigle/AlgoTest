@@ -1,4 +1,6 @@
-﻿using DataAccess;
+﻿using System;
+using System.Linq;
+using DataAccess;
 using Model;
 using Utils;
 
@@ -14,21 +16,29 @@ namespace AlgoTest
             var leagueRepo = new LeagueRepository(context);
             var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>();
 
-            // FILE STUFF
-            var fixtures = csvHandler.ParseFile(directory);
-            foreach (var fixture in fixtures)
-            {
-                leagueRepo.AddFixture(fixture);
-            }
+            var lastSixHomeGamesForArsenal = leagueRepo.GetLastSixHomeResults("Arsenal");
+            Console.WriteLine("Wins: {0}, Draws: {1}, Losses: {2}, Points: {3}", 
+                lastSixHomeGamesForArsenal.Wins, 
+                lastSixHomeGamesForArsenal.Draws, 
+                lastSixHomeGamesForArsenal.Losses, 
+                lastSixHomeGamesForArsenal.Points);
+            Console.ReadLine();
 
-            //DOWNLOAD STUFF
-            var results = csvHandler.DownloadFile(fileUrl).Result;
-            foreach (var result in results)
-            {
-                leagueRepo.AddFixture(result);
-            }
+            //// FILE STUFF
+            //var fixtures = csvHandler.ParseFile(directory);
+            //foreach (var fixture in fixtures)
+            //{
+            //    leagueRepo.AddFixture(fixture);
+            //}
 
-            context.SaveChanges();
+            ////DOWNLOAD STUFF
+            //var results = csvHandler.DownloadFile(fileUrl).Result;
+            //foreach (var result in results)
+            //{
+            //    leagueRepo.AddFixture(result);
+            //}
+
+            //context.SaveChanges();
 
         }
     }
