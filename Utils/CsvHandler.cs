@@ -23,7 +23,7 @@ namespace Utils
                 }
             }
 
-            return records.AsEnumerable();
+            return records;
         }
 
         public async Task<IEnumerable<T>> DownloadFile(string urlFilePath)
@@ -44,7 +44,7 @@ namespace Utils
             }
             catch (Exception ex)
             {
-                return new List<T>().AsEnumerable();
+                return new List<T>();
             }
         }
 
@@ -52,7 +52,8 @@ namespace Utils
         {
             var reader = new CsvReader(sr);
             reader.Configuration.RegisterClassMap<TMap>();
-            return reader.GetRecords<T>();
+            var records = reader.GetRecords<T>().ToList();
+            return records;
         }
     }
 }

@@ -11,7 +11,9 @@ namespace AlgoTest
         static void Main(string[] args)
         {
             const string directory = @"C:\Users\dean.mcgarrigle\Dropbox\Documents\FootballData";
-            const string fileUrl = @"SomeFileURLHere";
+            const string season = "1415";
+            var leagues = new[] {"E0", "E1", "E2", "EC" };
+            var fileUrl = string.Format("http://www.football-data.co.uk/mmz4281/{0}", season);
             var context = new AlgoTestContext();
             var leagueRepo = new LeagueRepository(context);
             var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>();
@@ -35,8 +37,6 @@ namespace AlgoTest
             Console.WriteLine();
             Console.WriteLine("Fulham: {0} {2}, Bournemouth: {1} {3}", fulhamHomeGoalsForScore, bouremouthAwayGoalsForScore, fulhamHomeGoalsAgainstScore, bouremouthAwayGoalsAgainstScore);
 
-            Console.ReadLine();
-
             //// FILE STUFF
             //var fixtures = csvHandler.ParseFile(directory);
             //foreach (var fixture in fixtures)
@@ -44,15 +44,19 @@ namespace AlgoTest
             //    leagueRepo.AddFixture(fixture);
             //}
 
-            ////DOWNLOAD STUFF
-            //var results = csvHandler.DownloadFile(fileUrl).Result;
-            //foreach (var result in results)
-            //{
-            //    leagueRepo.AddFixture(result);
-            //}
+            //DOWNLOAD STUFF
+            foreach (var league in leagues)
+            {
+                var results = csvHandler.DownloadFile(string.Format("{0}/{1}.csv", fileUrl, league)).Result;
+                foreach (var result in results)
+                {
+                    leagueRepo.AddFixture(result);
+                }
+            }
 
-            //context.SaveChanges();
-
+            context.SaveChanges();
+            Console.WriteLine("Added fixtures");
+            Console.ReadLine();
         }
     }
 }
