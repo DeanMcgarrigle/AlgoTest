@@ -26,84 +26,82 @@ namespace DataAccess
             }
         }
 
-        public int GetHomeTeamGoalsAgainstScore(string team, DateTime startDate)
+        public int GetGoalsForScore(string team, DateTime startDate, FixtureType fixtureType)
+        {
+            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
+               .FirstOrDefault(x => x.HomeTeam == team)
+               .League;
+            var query =
+                _context.LeagueData.Where(x => x.DateTime >= startDate)
+                    .Where(x => x.League == league)
+                    .AsQueryable();
+
+            var teamGoals = new List<TeamScoring>();
+
+            switch (fixtureType)
+            {
+                case FixtureType.Home:
+                    teamGoals.AddRange(query
+                        .GroupBy(x => x.HomeTeam)
+                        .Select(x => new TeamScoring
+                        {
+                            Team = x.Key,
+                            Goals = x.Sum(y => y.FullTimeHomeGoals)
+                        })
+                        .OrderByDescending(x => x.Goals));
+                    break;
+                case FixtureType.Away:
+                    teamGoals.AddRange(query
+                        .GroupBy(x => x.AwayTeam)
+                        .Select(x => new TeamScoring
+                        {
+                            Team = x.Key,
+                            Goals = x.Sum(y => y.FullTimeAwayGoals)
+                        })
+                        .OrderByDescending(x => x.Goals));
+                    break;
+            }
+
+            return GetScores(team, teamGoals);
+        }
+
+        public int GetGoalsAgainstScore(string team, DateTime startDate, FixtureType fixtureType)
         {
             var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
                 .FirstOrDefault(x => x.HomeTeam == team)
                 .League;
-            var homeTeamGoals =
+            var query =
                 _context.LeagueData.Where(x => x.DateTime >= startDate)
                     .Where(x => x.League == league)
-                    .GroupBy(x => x.HomeTeam)
-                    .Select(x => new TeamScoring
-                    {
-                        Team = x.Key,
-                        Goals = x.Sum(y => y.FullTimeAwayGoals)
-                    })
-                    .OrderByDescending(x => x.Goals)
-                    .ToList();
+                    .AsQueryable();
 
-            return GetScores(team, homeTeamGoals, SortOrder.Desc);
-        }
+            var teamGoals = new List<TeamScoring>();
 
-        public int GetAwayTeamGoalsAgainstScore(string team, DateTime startDate)
-        {
-            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
-                .FirstOrDefault(x => x.HomeTeam == team)
-                .League;
-            var homeTeamGoals =
-                _context.LeagueData.Where(x => x.DateTime >= startDate)
-                    .Where(x => x.League == league)
-                    .GroupBy(x => x.AwayTeam)
-                    .Select(x => new TeamScoring
-                    {
-                        Team = x.Key,
-                        Goals = x.Sum(y => y.FullTimeHomeGoals)
-                    })
-                    .OrderByDescending(x => x.Goals)
-                    .ToList();
-
-            return GetScores(team, homeTeamGoals, SortOrder.Desc);
-        }
-
-        public int GetHomeTeamGoalsForScore(string team, DateTime startDate)
-        {
-            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
-                .FirstOrDefault(x => x.HomeTeam == team)
-                .League;
-            var homeTeamGoals =
-                _context.LeagueData.Where(x => x.DateTime >= startDate)
-                    .Where(x => x.League == league)
-                    .GroupBy(x => x.HomeTeam)
-                    .Select(x => new TeamScoring
-                    {
-                        Team = x.Key,
-                        Goals = x.Sum(y => y.FullTimeHomeGoals)
-                    })
-                    .OrderByDescending(x => x.Goals)
-                    .ToList();
-
-            return GetScores(team, homeTeamGoals);
-        }
-
-        public int GetAwayTeamGoalsForScore(string team, DateTime startDate)
-        {
-            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
-                            .FirstOrDefault(x => x.AwayTeam == team)
-                            .League;
-            var awayTeamGoals =
-                _context.LeagueData.Where(x => x.DateTime >= startDate)
-                    .Where(x => x.League == league)
-                    .GroupBy(x => x.AwayTeam)
-                    .Select(x => new TeamScoring
-                    {
-                        Team = x.Key,
-                        Goals = x.Sum(y => y.FullTimeAwayGoals)
-                    })
-                    .OrderByDescending(x => x.Goals)
-                    .ToList();
-
-            return GetScores(team, awayTeamGoals);
+            switch (fixtureType)
+            {
+                case FixtureType.Home:
+                    teamGoals.AddRange(query
+                        .GroupBy(x => x.HomeTeam)
+                        .Select(x => new TeamScoring
+                        {
+                            Team = x.Key,
+                            Goals = x.Sum(y => y.FullTimeAwayGoals)
+                        })
+                        .OrderByDescending(x => x.Goals));
+                    break;
+                    case FixtureType.Away:
+                    teamGoals.AddRange(query
+                        .GroupBy(x => x.AwayTeam)
+                        .Select(x => new TeamScoring
+                        {
+                            Team = x.Key,
+                            Goals = x.Sum(y => y.FullTimeHomeGoals)
+                        })
+                        .OrderByDescending(x => x.Goals));
+                    break;
+            }
+            
+            return GetScores(team, teamGoals, SortOrder.Desc);
         }
 
         public Result GetLastSixHomeResults(string team)
@@ -147,6 +145,12 @@ namespace DataAccess
         {
             Asc,
             Desc
+        }
+
+        public enum FixtureType
+        {
+            Home,
+            Away
         }
     }
 }
