@@ -18,7 +18,7 @@ namespace AlgoTest
             var leagueRepo = new LeagueRepository(context);
             var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>();
 
-            var lastSixHomeGamesForArsenal = leagueRepo.GetLastSixHomeResults("Arsenal");
+            var lastSixHomeGamesForArsenal = leagueRepo.GetLastSixResults("Arsenal", LeagueRepository.FixtureType.Away);
             Console.WriteLine("Arsenal:");
             Console.WriteLine("Wins: {0}, Draws: {1}, Losses: {2}, Points: {3}, Average Goals Scored per Game: {4}, Average Goals Conceded per Game: {5}", 
                 lastSixHomeGamesForArsenal.Wins, 

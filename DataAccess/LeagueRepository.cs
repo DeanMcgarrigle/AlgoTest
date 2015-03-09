@@ -89,7 +89,7 @@ namespace DataAccess
                         })
                         .OrderByDescending(x => x.Goals));
                     break;
-                    case FixtureType.Away:
+                case FixtureType.Away:
                     teamGoals.AddRange(query
                         .GroupBy(x => x.AwayTeam)
                         .Select(x => new TeamScoring
@@ -100,26 +100,50 @@ namespace DataAccess
                         .OrderByDescending(x => x.Goals));
                     break;
             }
-            
+
             return GetScores(team, teamGoals, SortOrder.Desc);
         }
 
-        public Result GetLastSixHomeResults(string team)
+        public Result GetLastSixResults(string team, FixtureType fixtureType)
         {
-            return _context.LeagueData.OrderByDescending(x => x.DateTime)
-                .Where(x => x.HomeTeam == team)
-                .Take(6)
-                .GroupBy(x => x.HomeTeam)
-                .Select(x => new Result
-                {
-                    Wins = x.Count(y => y.FullTimeResult == "H"),
-                    Draws = x.Count(y => y.FullTimeResult == "D"),
-                    Losses = x.Count(y => y.FullTimeResult == "A"),
-                    Points = x.Sum(y => y.FullTimeResult == "H" ? 3 : y.FullTimeResult == "D" ? 1 : 0),
-                    AvgGoalsScoredPerGame = x.Average(y => y.FullTimeHomeGoals),
-                    AvgGoalsConcededPerGame = x.Average(y => y.FullTimeAwayGoals)
-                })
-                .FirstOrDefault();
+            var query = _context.LeagueData.OrderByDescending(x => x.DateTime).AsQueryable();
+            var result = new Result();
+
+            switch (fixtureType)
+            {
+                case FixtureType.Home:
+                    result = query.Where(x => x.HomeTeam == team)
+                        .Take(6)
+                        .GroupBy(x => x.HomeTeam)
+                        .Select(x => new Result
+                        {
+                            Wins = x.Count(y => y.FullTimeResult == "H"),
+                            Draws = x.Count(y => y.FullTimeResult == "D"),
+                            Losses = x.Count(y => y.FullTimeResult == "A"),
+                            Points = x.Sum(y => y.FullTimeResult == "H" ? 3 : y.FullTimeResult == "D" ? 1 : 0),
+                            AvgGoalsScoredPerGame = x.Average(y => y.FullTimeHomeGoals),
+                            AvgGoalsConcededPerGame = x.Average(y => y.FullTimeAwayGoals)
+                        })
+                        .FirstOrDefault();
+                    break;
+                case FixtureType.Away:
+                    result = query.Where(x => x.AwayTeam == team)
+                        .Take(6)
+                        .GroupBy(x => x.AwayTeam)
+                        .Select(x => new Result
+                        {
+                            Wins = x.Count(y => y.FullTimeResult == "A"),
+                            Draws = x.Count(y => y.FullTimeResult == "D"),
+                            Losses = x.Count(y => y.FullTimeResult == "H"),
+                            Points = x.Sum(y => y.FullTimeResult == "A" ? 3 : y.FullTimeResult == "D" ? 1 : 0),
+                            AvgGoalsScoredPerGame = x.Average(y => y.FullTimeAwayGoals),
+                            AvgGoalsConcededPerGame = x.Average(y => y.FullTimeHomeGoals)
+                        })
+                        .FirstOrDefault();
+                    break;
+            }
+
+            return result;
         }
 
         private static int GetScores(string team, List<TeamScoring> teamGoals, SortOrder sortOrder = SortOrder.Asc)
