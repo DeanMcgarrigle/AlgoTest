@@ -28,14 +28,7 @@ namespace DataAccess
 
         public int GetGoalsForScore(string team, DateTime startDate, FixtureType fixtureType)
         {
-            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
-               .FirstOrDefault(x => x.HomeTeam == team)
-               .League;
-            var query =
-                _context.LeagueData.Where(x => x.DateTime >= startDate)
-                    .Where(x => x.League == league)
-                    .AsQueryable();
-
+            var query = LoadLeagueDataForTeam(team, startDate);
             var teamGoals = new List<TeamScoring>();
 
             switch (fixtureType)
@@ -67,14 +60,7 @@ namespace DataAccess
 
         public int GetGoalsAgainstScore(string team, DateTime startDate, FixtureType fixtureType)
         {
-            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
-                .FirstOrDefault(x => x.HomeTeam == team)
-                .League;
-            var query =
-                _context.LeagueData.Where(x => x.DateTime >= startDate)
-                    .Where(x => x.League == league)
-                    .AsQueryable();
-
+            var query = LoadLeagueDataForTeam(team, startDate);
             var teamGoals = new List<TeamScoring>();
 
             switch (fixtureType)
@@ -144,6 +130,18 @@ namespace DataAccess
             }
 
             return result;
+        }
+
+        private IQueryable<LeagueData> LoadLeagueDataForTeam(string team, DateTime startDate)
+        {
+            var league = _context.LeagueData.Where(y => y.DateTime >= startDate)
+                .FirstOrDefault(x => x.HomeTeam == team)
+                .League;
+            var query =
+                _context.LeagueData.Where(x => x.DateTime >= startDate)
+                    .Where(x => x.League == league)
+                    .AsQueryable();
+            return query;
         }
 
         private static int GetScores(string team, List<TeamScoring> teamGoals, SortOrder sortOrder = SortOrder.Asc)
