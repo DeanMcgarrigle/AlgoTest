@@ -56,6 +56,14 @@
     <Compile Include="Migrations\201503051106271_Initial.Designer.cs">
       <DependentUpon>201503051106271_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201505221208203_addedMetricTable.cs" />
+    <Compile Include="Migrations\201505221208203_addedMetricTable.Designer.cs">
+      <DependentUpon>201505221208203_addedMetricTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505221402585_addedLeagueFieldToMetricTable.cs" />
+    <Compile Include="Migrations\201505221402585_addedLeagueFieldToMetricTable.Designer.cs">
+      <DependentUpon>201505221402585_addedLeagueFieldToMetricTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -72,6 +80,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201503051106271_Initial.resx">
       <DependentUpon>201503051106271_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505221208203_addedMetricTable.resx">
+      <DependentUpon>201505221208203_addedMetricTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505221402585_addedLeagueFieldToMetricTable.resx">
+      <DependentUpon>201505221402585_addedLeagueFieldToMetricTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

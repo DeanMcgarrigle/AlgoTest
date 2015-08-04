@@ -17,7 +17,6 @@ namespace Utils
             Map(m => m.HalfTimeHomeGoals).Name("HTHG");
             Map(m => m.HalfTimeAwayGoals).Name("HTAG");
             Map(m => m.HalfTimeResult).Name("HTR");
-            Map(m => m.Referee).Name("Referee");
             Map(m => m.HomeTeamShots).Name("HS");
             Map(m => m.AwayTeamShots).Name("AS");
             Map(m => m.HomeTeamShotsOnTarget).Name("HST");
