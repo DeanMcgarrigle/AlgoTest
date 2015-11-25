@@ -38,6 +38,21 @@ namespace DataAccess
             });
         }
 
+        public List<TeamStats> LoadTeam(string team)
+        {
+            var data = _context.LeagueData.Where(y => y.HomeTeam.Contains(team) || y.AwayTeam.Contains(team)).Select(x => new TeamStats
+            {
+                Team = team,
+                Location = x.HomeTeam == team ? "H" : "A",
+                Date = x.DateTime,
+                GoalsFor =  x.HomeTeam == team ? x.FullTimeHomeGoals : x.FullTimeAwayGoals,
+                GoalsAgainst = x.HomeTeam == team ? x.FullTimeAwayGoals : x.FullTimeHomeGoals,
+                FTResult = x.FullTimeResult
+            }).OrderByDescending(x => x.Date).Take(10);
+
+            return data.ToList();
+        }
+
         public List<TeamStats> LoadHomeTeam(string team)
         {
             var data = _context.LeagueData.Where(y => y.HomeTeam.Contains(team)).Select(x => new TeamStats
