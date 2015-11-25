@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
+using Microsoft.SqlServer.Server;
 using Model;
 
 namespace DataAccess
@@ -43,10 +44,10 @@ namespace DataAccess
             var data = _context.LeagueData.Where(y => y.HomeTeam.Contains(team) || y.AwayTeam.Contains(team)).Select(x => new TeamStats
             {
                 Team = team,
-                Location = x.HomeTeam == team ? "H" : "A",
+                Location = x.HomeTeam.Contains(team) ? "H" : "A",
                 Date = x.DateTime,
-                GoalsFor =  x.HomeTeam == team ? x.FullTimeHomeGoals : x.FullTimeAwayGoals,
-                GoalsAgainst = x.HomeTeam == team ? x.FullTimeAwayGoals : x.FullTimeHomeGoals,
+                GoalsFor = x.HomeTeam.Contains(team) ? x.FullTimeHomeGoals : x.FullTimeAwayGoals,
+                GoalsAgainst = x.HomeTeam.Contains(team) ? x.FullTimeAwayGoals : x.FullTimeHomeGoals,
                 FTResult = x.FullTimeResult
             }).OrderByDescending(x => x.Date).Take(10);
 
@@ -83,6 +84,21 @@ namespace DataAccess
             return data.ToList();
         }
 
+        public List<TeamStats> H2H(string home, string away)
+        {
+            var data =
+                _context.LeagueData.Where(x => x.HomeTeam.Contains(home) && x.AwayTeam.Contains(away)).Select(y => new TeamStats
+                    {
+                        Team = home+ " v "+ away,
+                        Location = "n/a",
+                        Date = y.DateTime,
+                        GoalsFor =  y.FullTimeHomeGoals,
+                        GoalsAgainst =  y.FullTimeAwayGoals,
+                        FTResult = y.FullTimeResult
+                    });
+
+            return data.ToList();
+        }
 
     }
 

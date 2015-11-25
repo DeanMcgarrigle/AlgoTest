@@ -10,9 +10,10 @@ namespace AlgoTest
     {
         static void Main(string[] args)
         {
+
             const string directory = @"C:\Users\dean.mcgarrigle\Dropbox\public\FootballData";
             const string season = "1516";
-            var leagues = new[] {"E0", "E1", "E2", "E3", "EC" };
+            var leagues = new[] { "E0", "E1", "E2", "E3", "EC" };
             var fileUrl = string.Format("http://www.football-data.co.uk/mmz4281/{0}", season);
             var context = new AlgoTestContext();
             var leagueRepo = new LeagueRepository(context);
@@ -42,6 +43,15 @@ namespace AlgoTest
 
             if (input == "predict")
             {
+             Run();
+            }
+
+        }
+
+        public static void Run()
+        {
+            while (true)
+            {
                 Console.Write("Enter home team: ");
                 string hometeam = Console.ReadLine();
 
@@ -49,14 +59,13 @@ namespace AlgoTest
                 string awayteam = Console.ReadLine();
 
                 Console.WriteLine("predicting...");
-                
+
                 var result = PredictEngine.Predict(hometeam, awayteam);
                 Console.WriteLine(result);
+                Console.WriteLine("");
+                Console.WriteLine("Press enter to predict another game");
                 Console.ReadLine();
             }
-        
-            //DOWNLOAD STUFF
-            
         }
     }
 }

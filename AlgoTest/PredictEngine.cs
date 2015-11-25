@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security;
 using DataAccess;
@@ -8,8 +9,6 @@ namespace AlgoTest
 {
     public class PredictEngine
     {
-
-
         public static string Predict(string home, string away)
         {
             var context = new AlgoTestContext();
@@ -23,6 +22,7 @@ namespace AlgoTest
             var overallAway = leagueRepo.LoadTeam(away);
             var hometeam = leagueRepo.LoadHomeTeam(home);
             var awayteam = leagueRepo.LoadAwayTeam(away);
+            var h2h = leagueRepo.H2H(home, away);
 
 
             #region Home Team (Home Form)
@@ -181,7 +181,7 @@ namespace AlgoTest
                     }
                 }
 
-
+                overallForm = "";
                 overallForm = overallForm + r;
             }
 
@@ -204,13 +204,39 @@ namespace AlgoTest
 
             #region HeadToHead
 
+            var homeh2hTotal = 0.0;
+            var awayh2hTotal = 0.0;
+
+            foreach (var val in h2h)
+            {
+                if (val.GoalsFor > val.GoalsAgainst)
+                {
+                    homeh2hTotal = homeh2hTotal + 3;
+                }
+                else if (val.GoalsFor == val.GoalsAgainst)
+                {
+                    homeh2hTotal = homeh2hTotal + 1;
+                    awayh2hTotal = awayh2hTotal + 1;
+                }
+                else
+                {
+                    awayh2hTotal = awayh2hTotal + 3;
+                }
+            }
+
             #endregion
 
-            #region HomeTeam (Goals Scored)
+            #region HomeTeam (Goals Scored/Conceded)
+
+            var homeGoalsFor = overallHome.Sum(x => x.GoalsFor);
+            var homeGoalsAgainst = overallHome.Sum(x => x.GoalsAgainst);
 
             #endregion
 
-            #region AwayTeam (Goals Scored)
+            #region AwayTeam (Goals Scored/Conceded)
+
+            var awayGoalsFor = overallAway.Sum(x => x.GoalsFor);
+            var awayGoalsAgainst = overallAway.Sum(x => x.GoalsAgainst);
 
             #endregion
 
@@ -224,10 +250,40 @@ namespace AlgoTest
             var awayTotal = 0.0;
             var homePct = 0.0;
             var awayPct = 0.0;
+            var homeGoalValue = 0.0;
+            var awayGoalValue = 0.0;
             var resultString = "";
 
-            homeTotal = Convert.ToDouble(homeTeamFormValue + homeTeamOverallFormValue);
-            awayTotal = Convert.ToDouble(awayTeamFormValue + awayTeamOverallFormValue);
+           if (homeGoalsFor > awayGoalsFor)
+            {
+                homeGoalValue = homeGoalValue + 2;
+            }
+            else if (homeGoalsFor == awayGoalsFor)
+            {
+                homeGoalValue = homeGoalValue + 1;
+                awayGoalValue = awayGoalValue + 1;
+            }
+            else
+            {
+                awayGoalValue = awayGoalValue + 2;
+            }
+
+            if (homeGoalsFor > homeGoalsAgainst)
+            {
+                homeGoalValue = homeGoalValue + 1;
+            }
+
+            if (awayGoalsFor > awayGoalsAgainst)
+            {
+                awayGoalValue = awayGoalValue + 1;
+            }
+
+            var h2hMax = (h2h.Count*3);
+            homeh2hTotal = (homeh2hTotal/h2hMax)*10;
+            awayh2hTotal = (awayh2hTotal / h2hMax) * 10;
+
+            homeTotal = (Convert.ToDouble(homeTeamFormValue + homeTeamOverallFormValue) / 3) + (homeGoalValue * 2) + homeh2hTotal;
+            awayTotal = (Convert.ToDouble(awayTeamFormValue + awayTeamOverallFormValue) / 3) + (awayGoalValue * 2) + awayh2hTotal;
 
             homePct = (homeTotal / (homeTotal + awayTotal)) * 100;
             awayPct = (awayTotal / (homeTotal + awayTotal)) * 100;
