@@ -21,7 +21,6 @@ namespace DataAccess
         }
 
         public DbSet<LeagueData> LeagueData { get; set; }
-        public DbSet<MetricData> MetricData { get; set; }
 
     }
 
@@ -31,15 +30,6 @@ namespace DataAccess
         {
             ToTable("LeagueData");
             HasKey(x => new { x.DateTime, x.HomeTeam, x.AwayTeam });
-        }
-    }
-
-    public class MetricDataEntityMap : EntityTypeConfiguration<MetricData>
-    {
-        public MetricDataEntityMap()
-        {
-            ToTable("MetricData");
-            HasKey(x => new { x.Team});
         }
     }
 }

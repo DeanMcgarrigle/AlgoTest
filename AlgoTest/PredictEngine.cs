@@ -23,7 +23,11 @@ namespace AlgoTest
             var hometeam = leagueRepo.LoadHomeTeam(home);
             var awayteam = leagueRepo.LoadAwayTeam(away);
             var h2h = leagueRepo.H2H(home, away);
+            var homeShotStatsList = leagueRepo.LeagueShotStatsHome();
+            var awayShotStatsList = leagueRepo.LeagueShotStatsAway();
 
+            var homeShotStats = homeShotStatsList.Where(x => x.Team.Contains(home));
+            var awayShotStats = awayShotStatsList.Where(x => x.Team.Contains(away));
 
             #region Home Team (Home Form)
 
@@ -131,7 +135,6 @@ namespace AlgoTest
                     }
                 }
 
-
                 overallForm = overallForm + r;
             }
 
@@ -154,6 +157,7 @@ namespace AlgoTest
 
             #region Away Team (Overall Form)
 
+            overallForm = "";
             foreach (var stats in overallAway)
             {
                 var r = "D";
@@ -181,7 +185,7 @@ namespace AlgoTest
                     }
                 }
 
-                overallForm = "";
+               
                 overallForm = overallForm + r;
             }
 
@@ -240,7 +244,13 @@ namespace AlgoTest
 
             #endregion
 
-            #region Stadium & Attendance
+            #region Shot stats and conversion rates (Home)
+
+
+
+            #endregion
+
+            #region Shot stats and conversion rates (Home)
 
             #endregion
 
@@ -279,20 +289,29 @@ namespace AlgoTest
             }
 
             var h2hMax = (h2h.Count*3);
-            homeh2hTotal = (homeh2hTotal/h2hMax)*10;
-            awayh2hTotal = (awayh2hTotal / h2hMax) * 10;
+            if (h2h.Count > 0)
+            {
+                homeh2hTotal = (homeh2hTotal/h2hMax)*10;
+                awayh2hTotal = (awayh2hTotal/h2hMax)*10;
+            }
+            else
+            {
+                homeh2hTotal = 0;
+                awayh2hTotal = 0;
+            }
+           
 
-            homeTotal = (Convert.ToDouble(homeTeamFormValue + homeTeamOverallFormValue) / 3) + (homeGoalValue * 2) + homeh2hTotal;
-            awayTotal = (Convert.ToDouble(awayTeamFormValue + awayTeamOverallFormValue) / 3) + (awayGoalValue * 2) + awayh2hTotal;
+            homeTotal = (Convert.ToDouble(homeTeamFormValue + homeTeamOverallFormValue) / 3) + (homeGoalValue * 2) + (homeh2hTotal *0.75);
+            awayTotal = (Convert.ToDouble(awayTeamFormValue + awayTeamOverallFormValue) / 3) + (awayGoalValue * 2) + (awayh2hTotal * 0.75);
 
             homePct = (homeTotal / (homeTotal + awayTotal)) * 100;
             awayPct = (awayTotal / (homeTotal + awayTotal)) * 100;
 
-            if (homePct >= 55.0)
+            if (homePct >= 54.0)
             {
                 resultString = "Home Win";
             }
-            else if (awayPct >= 55.0)
+            else if (awayPct >= 54.0)
             {
                 resultString = "Away Win";
             }

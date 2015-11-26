@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
+using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.SqlServer.Server;
 using Model;
 
@@ -10,9 +12,7 @@ namespace DataAccess
     public class LeagueRepository
     {
         private readonly AlgoTestContext _context;
-
-         List<MetricData> list  = new List<MetricData>();
-
+       
         public LeagueRepository(AlgoTestContext context)
         {
             _context = context;
@@ -28,15 +28,6 @@ namespace DataAccess
             {
                 _context.LeagueData.Add(fixture);
             }
-        }
-        
-        public void AddTeam(LeagueData team)
-        {
-            _context.MetricData.AddOrUpdate(x => x.Team, new MetricData
-            {
-                Team = team.HomeTeam,
-                League = team.League
-            });
         }
 
         public List<TeamStats> LoadTeam(string team)
@@ -100,6 +91,48 @@ namespace DataAccess
             return data.ToList();
         }
 
+        public List<LeagueShotStats> LeagueShotStatsHome()
+        {
+            var data =
+                _context.LeagueData.Where(x => x.DateTime > new DateTime(2015, 07, 30))
+                    .GroupBy(x => x.HomeTeam)
+                    .Select(x => new LeagueShotStats
+                    {
+                        Team = x.Key,
+                        Shots = x.Sum(y => y.HomeTeamShots),
+                        Goals = x.Sum(y => y.FullTimeHomeGoals),
+                        OnTarget = x.Sum(y => y.HomeTeamShotsOnTarget)
+                    }).ToList();
+
+            foreach (var a in data)
+            {
+                a.Ratio = Convert.ToDouble(a.Shots)/Convert.ToDouble(a.Goals);
+            }
+
+            return data;
+        }
+
+        public List<LeagueShotStats> LeagueShotStatsAway()
+        {
+            var data =
+                _context.LeagueData.Where(x => x.DateTime > new DateTime(2015, 07, 30))
+                    .GroupBy(x => x.AwayTeam)
+                    .Select(x => new LeagueShotStats
+                    {
+                        Team = x.Key,
+                        Shots = x.Sum(y => y.AwayTeamShots),
+                        Goals = x.Sum(y => y.FullTimeAwayGoals),
+                        OnTarget = x.Sum(y => y.AwayTeamShotsOnTarget)
+                       
+                    }).ToList();
+            foreach (var a in data)
+            {
+                a.Ratio = Convert.ToDouble(a.Shots) / Convert.ToDouble(a.Goals);
+            }
+
+            return data;
+        }
+
     }
 
     public class TeamStats
@@ -110,5 +143,14 @@ namespace DataAccess
         public int GoalsFor { get; set; }
         public int GoalsAgainst { get; set; }
         public string FTResult { get; set; }
+    }
+
+    public class LeagueShotStats
+    {
+        public string Team { get; set; }
+        public int Shots { get; set; }
+        public int Goals { get; set; }
+        public int OnTarget { get; set; }
+        public double Ratio { get; set; }
     }
 }

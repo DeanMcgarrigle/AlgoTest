@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using DataAccess;
 using Model;
@@ -12,6 +13,7 @@ namespace AlgoTest
         {
 
             const string directory = @"C:\Users\dean.mcgarrigle\Dropbox\public\FootballData";
+            const string fixtures = @"C:\Users\dean.mcgarrigle\Dropbox\public\FootballData\fixturelist.csv";
             const string season = "1516";
             var leagues = new[] { "E0", "E1", "E2", "E3", "EC" };
             var fileUrl = string.Format("http://www.football-data.co.uk/mmz4281/{0}", season);
@@ -31,7 +33,6 @@ namespace AlgoTest
                     foreach (var result in results)
                     {
                         leagueRepo.AddFixture(result);
-                        leagueRepo.AddTeam(result);
                         Console.WriteLine("Adding Fixture: " + result.HomeTeam + " v " + result.AwayTeam);
                     }
                 }
@@ -39,6 +40,28 @@ namespace AlgoTest
                 context.SaveChanges();
                 Console.WriteLine("Added fixtures");
                 Console.ReadLine();
+            
+            }
+
+            if (input == "simulate")
+            {
+                string[] teams = File.ReadAllLines(fixtures);
+
+
+                var query = from line in teams
+                            let data = line.Split(',')
+                            select new HeadToHead()
+                            {
+                                Home = data[0],
+                                Away = data[1],
+                            };
+
+                foreach (var a in query)
+                {
+                    RunSimulation(a.Home, a.Away);
+                }
+                Console.ReadLine();
+
             }
 
             if (input == "predict")
@@ -67,5 +90,18 @@ namespace AlgoTest
                 Console.ReadLine();
             }
         }
+
+        public static void RunSimulation(string home, string away)
+        {
+                var result = PredictEngine.Predict(home, away);
+                Console.WriteLine(result);
+        }
+
+        public class HeadToHead
+        {
+            public string Home { get; set; }
+            public string Away { get; set; }
+        }
+
     }
 }
