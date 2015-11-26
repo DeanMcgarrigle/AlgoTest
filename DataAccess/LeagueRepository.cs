@@ -12,7 +12,7 @@ namespace DataAccess
     public class LeagueRepository
     {
         private readonly AlgoTestContext _context;
-       
+
         public LeagueRepository(AlgoTestContext context)
         {
             _context = context;
@@ -30,11 +30,22 @@ namespace DataAccess
             }
         }
 
+        public string GetFTResult(string home, string away)
+        {
+            var data =
+                _context.LeagueData.Where(y => y.HomeTeam.Contains(home) && y.AwayTeam.Contains(away) && y.DateTime >= new DateTime(2015, 07, 30) && y.DateTime < DateTime.Now)
+                    .Select(x => x.FullTimeResult)
+                    .FirstOrDefault();
+
+            return data;
+        }
+
         public List<TeamStats> LoadTeam(string team)
         {
             var data = _context.LeagueData.Where(y => y.HomeTeam.Contains(team) || y.AwayTeam.Contains(team)).Select(x => new TeamStats
             {
                 Team = team,
+                League = x.League,
                 Location = x.HomeTeam.Contains(team) ? "H" : "A",
                 Date = x.DateTime,
                 GoalsFor = x.HomeTeam.Contains(team) ? x.FullTimeHomeGoals : x.FullTimeAwayGoals,
@@ -62,12 +73,12 @@ namespace DataAccess
 
         public List<TeamStats> LoadAwayTeam(string team)
         {
-            var data = _context.LeagueData.Where(y =>  y.AwayTeam.Contains(team)).Select(x => new TeamStats
+            var data = _context.LeagueData.Where(y => y.AwayTeam.Contains(team)).Select(x => new TeamStats
             {
                 Team = team,
                 Location = "A",
                 Date = x.DateTime,
-                GoalsFor =  x.FullTimeAwayGoals,
+                GoalsFor = x.FullTimeAwayGoals,
                 GoalsAgainst = x.FullTimeHomeGoals,
                 FTResult = x.FullTimeResult
             }).OrderByDescending(x => x.Date).Take(10);
@@ -80,11 +91,11 @@ namespace DataAccess
             var data =
                 _context.LeagueData.Where(x => x.HomeTeam.Contains(home) && x.AwayTeam.Contains(away)).Select(y => new TeamStats
                     {
-                        Team = home+ " v "+ away,
+                        Team = home + " v " + away,
                         Location = "n/a",
                         Date = y.DateTime,
-                        GoalsFor =  y.FullTimeHomeGoals,
-                        GoalsAgainst =  y.FullTimeAwayGoals,
+                        GoalsFor = y.FullTimeHomeGoals,
+                        GoalsAgainst = y.FullTimeAwayGoals,
                         FTResult = y.FullTimeResult
                     });
 
@@ -100,13 +111,18 @@ namespace DataAccess
                     {
                         Team = x.Key,
                         Shots = x.Sum(y => y.HomeTeamShots),
+                        ShotsFaced = x.Sum(y => y.AwayTeamShots),
                         Goals = x.Sum(y => y.FullTimeHomeGoals),
-                        OnTarget = x.Sum(y => y.HomeTeamShotsOnTarget)
+                        GoalsConceded = x.Sum(y => y.FullTimeAwayGoals),
+                        OnTarget = x.Sum(y => y.HomeTeamShotsOnTarget),
+                        ShotsFacedOnTarget = x.Sum(y => y.AwayTeamShotsOnTarget)
                     }).ToList();
 
             foreach (var a in data)
             {
-                a.Ratio = Convert.ToDouble(a.Shots)/Convert.ToDouble(a.Goals);
+                a.League = _context.LeagueData.Where(x => x.HomeTeam == a.Team).OrderByDescending(x => x.DateTime).Select(x => x.League).FirstOrDefault();
+                a.OffensiveRatio = Convert.ToDouble(a.Shots) / Convert.ToDouble(a.Goals);
+                a.DefensiveRatio = Convert.ToDouble(a.ShotsFaced) / Convert.ToDouble(a.GoalsConceded);
             }
 
             return data;
@@ -121,13 +137,17 @@ namespace DataAccess
                     {
                         Team = x.Key,
                         Shots = x.Sum(y => y.AwayTeamShots),
+                        ShotsFaced = x.Sum(y => y.HomeTeamShots),
                         Goals = x.Sum(y => y.FullTimeAwayGoals),
-                        OnTarget = x.Sum(y => y.AwayTeamShotsOnTarget)
-                       
+                        GoalsConceded = x.Sum(y => y.FullTimeHomeGoals),
+                        OnTarget = x.Sum(y => y.AwayTeamShotsOnTarget),
+                        ShotsFacedOnTarget = x.Sum(y => y.HomeTeamShotsOnTarget)
                     }).ToList();
             foreach (var a in data)
             {
-                a.Ratio = Convert.ToDouble(a.Shots) / Convert.ToDouble(a.Goals);
+                a.League = _context.LeagueData.Where(x => x.HomeTeam == a.Team).OrderByDescending(x => x.DateTime).Select(x => x.League).FirstOrDefault();
+                a.OffensiveRatio = Convert.ToDouble(a.Shots) / Convert.ToDouble(a.Goals);
+                a.DefensiveRatio = Convert.ToDouble(a.ShotsFaced) / Convert.ToDouble(a.GoalsConceded);
             }
 
             return data;
@@ -138,6 +158,7 @@ namespace DataAccess
     public class TeamStats
     {
         public string Team { get; set; }
+        public string League { get; set; }
         public string Location { get; set; }
         public DateTime Date { get; set; }
         public int GoalsFor { get; set; }
@@ -148,9 +169,14 @@ namespace DataAccess
     public class LeagueShotStats
     {
         public string Team { get; set; }
+        public string League { get; set; }
         public int Shots { get; set; }
+        public int ShotsFaced { get; set; }
         public int Goals { get; set; }
+        public int GoalsConceded { get; set; }
         public int OnTarget { get; set; }
-        public double Ratio { get; set; }
+        public int ShotsFacedOnTarget { get; set; }
+        public double OffensiveRatio { get; set; }
+        public double DefensiveRatio { get; set; }
     }
 }
