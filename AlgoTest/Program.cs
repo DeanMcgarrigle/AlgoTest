@@ -21,8 +21,8 @@ namespace AlgoTest
             const string directory = @"C:\Users\dean.mcgarrigle\Dropbox\public\FootballData";
             const string fixtures = @"C:\Users\dean.mcgarrigle\Dropbox\public\FootballData\fixturelist.csv";
 
-            Console.WriteLine("Which league do you want to simulate?");
-            var division = Console.ReadLine();
+            //Console.WriteLine("Which league do you want to simulate?");
+            var division = "E0";
             var context = new AlgoTestContext();
             var leagueRepo = new LeagueRepository(context);
             var csvHandler = new CsvHandler<LeagueData, LeagueDataMap>();

@@ -105,7 +105,7 @@ namespace DataAccess
         public List<LeagueShotStats> LeagueShotStatsHome()
         {
             var data =
-                _context.LeagueData.Where(x => x.DateTime > new DateTime(2015, 07, 30))
+                _context.LeagueData.Where(x => x.DateTime >= new DateTime(2015, 08, 08))
                     .GroupBy(x => x.HomeTeam)
                     .Select(x => new LeagueShotStats
                     {

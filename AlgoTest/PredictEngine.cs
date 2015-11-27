@@ -30,10 +30,14 @@ namespace AlgoTest
             var shotStatsHome = Program.homeShots;
             var shotStatsAway = Program.awayShots;
 
-            var homeShotStatsListO = shotStatsHome.OrderBy(x => x.OffensiveRatio).ToList();
+            var homeShotStatsListO = shotStatsHome.OrderBy(x => x.OffensiveRatio).ThenBy(x => x.Shots).ToList();
             var homeShotStatsListD = shotStatsHome.OrderByDescending(x => x.DefensiveRatio).ToList();
             var awayShotStatsListO = shotStatsAway.OrderBy(x => x.OffensiveRatio).ToList();
             var awayShotStatsListD = shotStatsAway.OrderByDescending(x => x.DefensiveRatio).ToList();
+            var homeGoalsScored = shotStatsHome.OrderByDescending(x => x.Goals).ThenByDescending(x => x.Shots).ToList();
+            var homeGoalsConceded = shotStatsHome.OrderBy(x => x.GoalsConceded).ThenBy(x => x.ShotsFaced).ToList();
+            var awayGoalsScored = shotStatsAway.OrderByDescending(x => x.Goals).ThenByDescending(x => x.Shots).ToList();
+            var awayGoalsConceded = shotStatsAway.OrderBy(x => x.GoalsConceded).ThenBy(x => x.ShotsFaced).ToList();
 
             //var homeShotStats = homeShotStatsList.FirstOrDefault(x => x.Team.ToLower().Contains(home.ToLower()));
             //var awayShotStats = awayShotStatsList.FirstOrDefault(x => x.Team.ToLower().Contains(away.ToLower()));
@@ -244,12 +248,71 @@ namespace AlgoTest
             var homeGoalsFor = overallHome.Sum(x => x.GoalsFor);
             var homeGoalsAgainst = overallHome.Sum(x => x.GoalsAgainst);
 
+            var homeFor = 0;
+            var homeAgainst = 0;
+            var normalisedHomeFor = 10;
+            var normalisedHomeAgainst = 10;
+
+            for (int i = 0; i < homeGoalsScored.Count(); i++)
+            {
+                if (homeGoalsScored[i].Team.ToLower().Contains(home.ToLower()))
+                {
+                    homeFor = normalisedHomeFor;
+                }
+                if ((i + 1) % 2 == 0)
+                {
+                    normalisedHomeFor = normalisedHomeFor - 1;
+                }
+            }
+
+            for (int i = 0; i < homeGoalsConceded.Count(); i++)
+            {
+                if (homeGoalsConceded[i].Team.ToLower().Contains(home.ToLower()))
+                {
+                    homeAgainst = normalisedHomeAgainst;
+                }
+                if ((i + 1) % 2 == 0)
+                {
+                    normalisedHomeAgainst = normalisedHomeAgainst - 1;
+                }
+            }
+
             #endregion
 
             #region AwayTeam (Goals Scored/Conceded)
 
             var awayGoalsFor = overallAway.Sum(x => x.GoalsFor);
             var awayGoalsAgainst = overallAway.Sum(x => x.GoalsAgainst);
+
+
+            var awayFor = 0;
+            var awayAgainst = 0;
+            var normalisedAwayFor = 10;
+            var normalisedAwayAgainst = 10;
+
+            for (int i = 0; i < awayGoalsScored.Count(); i++)
+            {
+                if (awayGoalsScored[i].Team.ToLower().Contains(home.ToLower()))
+                {
+                    awayFor = normalisedAwayFor;
+                }
+                if ((i + 1) % 2 == 0)
+                {
+                    normalisedAwayFor = normalisedAwayFor - 1;
+                }
+            }
+
+            for (int i = 0; i < awayGoalsConceded.Count(); i++)
+            {
+                if (awayGoalsConceded[i].Team.ToLower().Contains(home.ToLower()))
+                {
+                    awayAgainst = normalisedAwayAgainst;
+                }
+                if ((i + 1) % 2 == 0)
+                {
+                    normalisedAwayAgainst = normalisedAwayAgainst - 1;
+                }
+            }
 
             #endregion
 
@@ -368,17 +431,24 @@ namespace AlgoTest
             var homeTeamStatScore = (Convert.ToDouble(offensiveRankH + defensiveRankH)) / 2;
             var awayTeamStatScore = (Convert.ToDouble(offensiveRankA + defensiveRankA)) / 2;
 
-            homeTotal = (Convert.ToDouble(homeTeamFormValue + homeTeamOverallFormValue) / 3) + (homeGoalValue * 2) + (homeh2hTotal * 0.75) + (homeTeamStatScore * 0.20);
-            awayTotal = (Convert.ToDouble(awayTeamFormValue + awayTeamOverallFormValue) / 3) + (awayGoalValue * 2) + (awayh2hTotal * 0.75) + (awayTeamStatScore * 0.20);
+            var goalStatsHomeScore = (Convert.ToDouble(homeFor + homeAgainst))/2;
+            var goalStatsAwayScore = (Convert.ToDouble(awayFor + awayAgainst))/2;
+
+            homeTotal = (Convert.ToDouble(homeTeamFormValue + (homeTeamOverallFormValue)) / 3) + (homeGoalValue * 2) + (homeh2hTotal * 0.75) + (homeTeamStatScore * 0.20);
+            awayTotal = (Convert.ToDouble(awayTeamFormValue + (awayTeamOverallFormValue)) / 3) + (awayGoalValue * 2) + (awayh2hTotal * 0.75) + (awayTeamStatScore * 0.17);
+
+            
+            //homeTotal = ((Convert.ToDouble(homeTeamFormValue + (homeTeamOverallFormValue)) / 3) * 1.25) + ((homeGoalValue * 2) * 0.5) + (goalStatsHomeScore * 0.8) + (homeh2hTotal * 1) + (homeTeamStatScore * 0.75);
+            //awayTotal = ((Convert.ToDouble(awayTeamFormValue + (awayTeamOverallFormValue)) / 3) * 1.25) + ((awayGoalValue * 2) * 0.5) + (goalStatsAwayScore * 0.8) + (awayh2hTotal * 1) + (awayTeamStatScore * 0.75);
 
             homePct = (homeTotal / (homeTotal + awayTotal)) * 100;
             awayPct = (awayTotal / (homeTotal + awayTotal)) * 100;
 
-            if (homePct >= 54.5)
+            if (homePct >= 54.8)
             {
                 resultString = "Home Win";
             }
-            else if (awayPct >= 54.5)
+            else if (awayPct >= 54.8)
             {
                 resultString = "Away Win";
             }
