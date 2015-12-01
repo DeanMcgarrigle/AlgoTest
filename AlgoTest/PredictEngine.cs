@@ -436,11 +436,13 @@ namespace AlgoTest
 
 
             // 71% //
+
             //homeTotal = (Convert.ToDouble(homeTeamFormValue + (homeTeamOverallFormValue)) / 3) + (homeGoalValue * 2) + (homeh2hTotal * 0.75) + (homeTeamStatScore * 0.20);
             //awayTotal = (Convert.ToDouble(awayTeamFormValue + (awayTeamOverallFormValue)) / 3) + (awayGoalValue * 2) + (awayh2hTotal * 0.75) + (awayTeamStatScore * 0.17);
 
+            // 71% also... // 
 
-            homeTotal = ((Convert.ToDouble(homeTeamFormValue + (homeTeamOverallFormValue)) / 3) * 1) + ((homeGoalValue * 2) * 1) + (goalStatsHomeScore * 0.51) + (homeh2hTotal * 0.755) + (homeTeamStatScore * 0.20);
+            homeTotal = ((Convert.ToDouble(homeTeamFormValue + (homeTeamOverallFormValue)) / 3) * 1) + ((homeGoalValue * 2) * 1) + (goalStatsHomeScore * 0.51) + (homeh2hTotal * 0.775) + (homeTeamStatScore * 0.20);
             awayTotal = ((Convert.ToDouble(awayTeamFormValue + (awayTeamOverallFormValue)) / 3) * 1) + ((awayGoalValue * 2) * 1.05) + (goalStatsAwayScore * 0.5) + (awayh2hTotal * 0.7535) + (awayTeamStatScore * 0.19);
 
             homePct = (homeTotal / (homeTotal + awayTotal)) * 100;
