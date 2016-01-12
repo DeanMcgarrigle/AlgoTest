@@ -63,7 +63,10 @@ namespace AlgoTest
                                 Home = data[0],
                                 Away = data[1],
                             };
-                foreach (var a in query.Take(140).Reverse().Take(100).Reverse())
+
+                var upToNow = query.Take(170).Reverse().Take(60).Reverse();
+
+                foreach (var a in upToNow)
                 {
                     if (!RunSimulation(a.Home, a.Away)) break;
                 }
